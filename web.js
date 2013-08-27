@@ -1,6 +1,10 @@
 var express = require('express');
 var app = express();
+var fs = require('fs');
+
 app.use(express.logger());
+
+fs.readFileSync(index.html);
 
 app.get('/', function(request, response) {
   response.send('Hello Kayla!');
