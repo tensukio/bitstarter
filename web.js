@@ -10,8 +10,14 @@ app.use(express.logger());
 app.get('/', function(request, response) {
 
 var buffer = new Buffer(data);
-response.send(buffer.toString());
-  response.send('Hello Kayla!');
+
+response.write(buffer.toString());
+response.write("Hello Kayla!");
+response.end();
+
+//response.send(buffer.toString());
+//response.send('Hello Kayla!');
+
 });
 
 
