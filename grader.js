@@ -24,8 +24,10 @@ References:
 var fs = require('fs');
 var program = require('commander');
 var cheerio = require('cheerio');
+var restler = require('restler');
 var HTMLFILE_DEFAULT = "index.html";
 var CHECKSFILE_DEFAULT = "checks.json";
+var URL_DEFAULT = "http://evening-shore-5268.herokuapp.com/";
 
 var assertFileExists = function(infile) {
     var instr = infile.toString();
@@ -35,6 +37,18 @@ var assertFileExists = function(infile) {
     }
     return instr;
 };
+
+/*
+var assertURLExists = function(url_ck) {
+    restler.get(url_ck).on('complete', function(result, response){
+	if(result instanceof Error){ 
+	    console.log("BAD URL");
+	    process.exit(1);
+	}
+	else { return url_ck;}
+	})
+}
+*/
 
 var cheerioHtmlFile = function(htmlfile) {
     return cheerio.load(fs.readFileSync(htmlfile));
@@ -63,13 +77,31 @@ var clone = function(fn) {
 
 if(require.main == module) {
     program
-        .option('-c, --checks <check_file>', 'Path to checks.json', clone(assertFileExists), CHECKSFILE_DEFAULT)
         .option('-f, --file <html_file>', 'Path to index.html', clone(assertFileExists), HTMLFILE_DEFAULT)
-        .parse(process.argv);
+        .option('-c, --checks <check_file>', 'Path to checks.json', clone(assertFileExists), CHECKSFILE_DEFAULT)
+        .option('-u, --url <url_path>', 'Path to heroku page')//, clone(assertURLExists), URL_DEFAULT)
+	.parse(process.argv);
+
+    console.log(program.url);
+
+    if(program.url != null){
+	console.log("IN URL MODE")
+	restler.get(program.url).on('complete', function(result){
+	//    console.log("CREATING OUTPUT FILE");
+	    fs.writeFileSync('outfile', result);
+	    var checkJson = checkHtmlFile('outfile', program.checks);
+	    var outJson = JSON.stringify(checkJson, null, 4);
+	//    console.log("crapping output");
+	    console.log(outJson);
+	 //   fs.unlink('outfile');
+	  //  console.log("Successfully cleared out output file");
+})
+    } else {
+
     var checkJson = checkHtmlFile(program.file, program.checks);
     var outJson = JSON.stringify(checkJson, null, 4);
     console.log(outJson);
+	}
 } else {
     exports.checkHtmlFile = checkHtmlFile;
 }
-
