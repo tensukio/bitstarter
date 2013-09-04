@@ -7,6 +7,9 @@ data = fs.readFileSync("index.html");
 
 app.use(express.logger());
 
+//adding bootstrap
+//app.use(express.static(__dirname + '/bootstrap'));
+
 app.get('/', function(request, response) {
 
 var buffer = new Buffer(data);
@@ -21,7 +24,7 @@ response.end();
 });
 
 
-var port = process.env.PORT || 5000;
+var port = process.env.PORT || 8080;
 app.listen(port, function() {
   console.log("Listening on " + port);
     
